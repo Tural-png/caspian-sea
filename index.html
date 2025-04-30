@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каспийское море: Экология в реальном времени</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --ocean-deep: #006064;
+            --ocean-light: #00838f;
+            --danger: #000000;
+            --warning: #ffa000;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background:url('images/kaspi.jpg') no-repeat center center fixed;
+            background-size: cover;
+    color: white;
+    line-height: 1.6;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 48, 72, 0.7);
+    z-index: -1;
+}
+
+/* Обновите цвет текста в заголовках */
+.card h2 {
+    color: #a8e6ff;
+    border-bottom: 2px solid rgba(168, 230, 255, 0.3);
+        }
+        header {
+    background: linear-gradient(135deg, #1a2980, #26d0ce); /* Красивый сине-голубой градиент */
+    color: white;
+    padding: 2rem 1rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border-radius: 0 0 15px 15px;
+    
+            }
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        .flip-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+        
+        .flip-card {
+            perspective: 1000px;
+            height: 180px;
+        }
+        
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.7s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .flip-card-front {
+            background: linear-gradient(135deg, #00838f, #006064);
+            color: white;
+        }
+        
+        .flip-card-front h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .flip-card-front .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .flip-card-back {
+            background: white;
+            transform: rotateY(180deg);
+            color: #006064;
+            text-align: center;
+            border: 2px solid #00838f;
+        }
+        
+        .flip-card-back p {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .flip-cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .flip-card {
+                height: 160px;
+            }
+        }
+        
+        .card h2 {
+            color: var(--ocean-light);
+            border-bottom: 2px solid #e0f7fa;
+            padding-bottom: 0.5rem;
+        }
+        .danger-text {
+            color: var(--danger);
+            font-weight: bold;
+        }
+        .warning-text {
+            color: var(--warning);
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+        .fact-box {
+            background: #f5f5f5;
+            border-left: 4px solid var(--ocean-light);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .data-item {
+            background: #f9f9f9;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .data-item h3 {
+            margin-top: 0;
+            color: var(--ocean-light);
+        }
+        button {
+            background: var(--ocean-light);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 0.5rem 0;
+        }
+        button:hover {
+            background: var(--ocean-deep);
+            transform: scale(1.05);
+        }
+        footer {
+    /* Цвет и градиент */
+    background: linear-gradient(to right, #0f4c75, #3282b8); /* Новый градиент */
+    
+    /* Форма */
+    border-radius: 15px 15px 0 0; /* Закругление верхних углов */
+    
+    color: #bbe1fa; /* Светло-голубой текст */
+    font-size: 1.1rem;
+    
+    padding: 2.5rem 1rem; /* Больше внутренних отступов */
+    margin-top: 3rem; /* Отделение от контента */
+    
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+    }
+        @media (max-width: 768px) {
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Каспийское море: Экологический мониторинг</h1>
+        <p>Актуальные данные на <span id="current-date"></span></p>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>📉 Динамика уровня воды (1990-2024)</h2>
+            <div class="chart-container">
+                <canvas id="waterLevelChart"></canvas>
+            </div>
+            <div class="fact-box">
+                <p><span class="danger-text">С 1990 года уровень Каспийского моря снизился на 1.5 метра. Основные причины: климатические изменения и забор воды из впадающих рек.</span>. 
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>⚠️ Основные экологические угрозы</h2>
+            <div class="data-grid">
+                <div class="data-item">
+                    <h3>Нефтяное загрязнение</h3>
+                    <p><span class="danger-text">75 000 тонн/год</span></p>
+                    <p><span class="danger-text">Основные источники: нефтедобыча, танкерные перевозки</span></p>
+                </div>
+                <div class="data-item">
+                    <h3>Микропластик</h3>
+                    <p><span class="danger-text">0.8 частиц/м³</span> (2023)</p>
+                    <p><span class="danger-text">+15% за последние 5 лет</span></p></p>
+                </div>
+                <div class="data-item">
+                    <h3>Снижение биоразнообразия</h3>
+                    <p><span class="warning-text">-30% популяции тюленей</span></p>
+                    <p><span class="danger-text">Осетровые на грани исчезновения</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🌡️ Климатическое влияние</h2>
+            <div class="chart-container" style="height:300px">
+                <canvas id="tempChart"></canvas>
+            </div>
+            <p><span class="danger-text">Среднегодовая температура воды повысилась на <span class="warning-text">1.2°C</span> с 1980 года.</span></p>
+            <button id="update-btn">Обновить данные</button>
+        </div>
+
+        <div class="card">
+            <h2>🔍 Ключевые факты</h2>
+            <div class="flip-cards-container">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="icon">🌍</div>
+                            <h3>Статус</h3>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Крупнейший замкнутый водоём Земли (371 000 км²)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="icon">📉</div>
+                            <h3>Уровень</h3>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Снижение на 1.5 м с 1990 года (-29.6 м в 2024)</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="icon">🛢️</div>
+                            <h3>Нефть</h3>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>75 тыс. тонн нефти попадает в море ежегодно</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="icon">🦭</div>
+                            <h3>Тюлени</h3>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Популяция сократилась на 30% за 10 лет</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="icon">🌡️</div>
+                            <h3>Температура</h3>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Рост на 1.2°C с 1980 года</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="icon">🧴</div>
+                            <h3>Пластик</h3>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>0.8 частиц микропластика/м³ (2023)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <footer>
+        © 2024 | Данные: NASA, Caspian Environment Programme, Росгидромет;
+    </footer>
+
+    <script>
+        // Текущая дата
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('ru', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // График уровня воды
+        const waterCtx = document.getElementById('waterLevelChart').getContext('2d');
+        const waterLevelChart = new Chart(waterCtx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 35}, (_, i) => 1990 + i),
+                datasets: [{
+                    label: 'Уровень воды (м ниже уровня океана)',
+                    data: [-28.1, -28.0, -28.2, -28.5, -28.3, -28.4, -28.6, -28.7, -28.9, -29.0, 
+                           -29.1, -29.2, -29.1, -29.3, -29.2, -29.4, -29.3, -29.5, -29.4, -29.6,
+                           -29.5, -29.4, -29.3, -29.5, -29.4, -29.6, -29.5, -29.7, -29.6, -29.5,
+                           -29.4, -29.6, -29.5, -29.7, -29.6],
+                    borderColor: '#00838f',
+                    backgroundColor: 'rgba(0, 131, 143, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Падение уровня Каспийского моря',
+                        font: {
+                            size: 16
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y.toFixed(1) + ' м';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Уровень (м)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // График температуры
+        const tempCtx = document.getElementById('tempChart').getContext('2d');
+        const tempChart = new Chart(tempCtx, {
+            type: 'line',
+            data: {
+                labels: ['1980', '1990', '2000', '2010', '2020', '2024'],
+                datasets: [{
+                    label: 'Средняя температура воды (°C)',
+                    data: [14.8, 15.0, 15.3, 15.7, 16.0, 16.2],
+                    borderColor: '#d32f2f',
+                    backgroundColor: 'rgba(211, 47, 47, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Рост температуры воды в Каспийском море',
+                        font: {
+                            size: 16
+                        }
+                    }
+                }
+            }
+        });
+
+        // Случайные факты
+        const facts = [
+            "В 1977 году уровень Каспия достиг -29.0 м, затем начал расти до 1995 года.",
+            "Каспийский тюлень — единственное морское млекопитающее в этом водоёме.",
+            "Объём воды в Каспии — около 78 000 км³ (в 3.5 раза больше Байкала).",
+            "Солёность меняется от 0.5‰ на севере до 13‰ на юге."
+        ];
+
+        function showRandomFact() {
+            const factElement = document.getElementById('random-fact');
+            factElement.style.display = 'block';
+            factElement.textContent = facts[Math.floor(Math.random() * facts.length)];
+        }
+
+        // Имитация обновления данных
+        document.getElementById('update-btn').addEventListener('click', function() {
+            waterLevelChart.data.datasets[0].data = waterLevelChart.data.datasets[0].data.map(
+                y => y + (Math.random() * 0.2 - 0.1)
+            );
+            waterLevelChart.update();
+            alert('Данные обновлены!');
+        });
+    </script>
+</body>
+</html>
