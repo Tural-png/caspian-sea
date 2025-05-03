@@ -25,14 +25,13 @@
     line-height: 1.6;
     position: relative;
 }
-        .tanker-route {
-    animation: pulse 2s infinite;
+.leaflet-interactive.leaflet-polyline {
+    animation: moveLine 5s infinite linear;
+    stroke-dasharray: 10, 10;
 }
 
-@keyframes pulse {
-    0% { opacity: 0.7; }
-    50% { opacity: 0.3; }
-    100% { opacity: 0.7; }
+@keyframes moveLine {
+    to { stroke-dashoffset: -20; }
 }
 
 
@@ -693,27 +692,7 @@ const routeStyle = {
     opacity: 0.7
 };
 
-// Основные маршруты танкеров
-const tankerRoutes = [
-    {
-        name: "Баку (Азербайджан) → Актау (Казахстан)",
-        coords: [
-            [40.4093, 49.8671], // Баку
-            [41.0, 50.5],        // Центр Каспия
-            [43.65, 51.1667]     // Актау
-        ],
-        details: "Перевозка нефти SOCAR → KMG"
-    },
-    {
-        name: "Махачкала (Россия) → Энзели (Иран)",
-        coords: [
-            [42.9833, 47.4833], // Махачкала
-            [42.5, 49.0],        // Северный Каспий
-            [37.4668, 49.4620]   // Энзели
-        ],
-        details: "Российская нефть в Иран"
-    }
-];
+
 
 // Добавляем маршруты на карту
 const routesLayer = L.layerGroup();
@@ -741,12 +720,68 @@ tankerRoutes.flatMap(r => r.coords.slice(0, -1)).forEach(coord => {
         .bindPopup("Нефтеналивной терминал")
         .addTo(routesLayer);
 });
+// Стили для маршрутов
+const routeStyle = {
+    color: '#e67e22',
+    weight: 3,
+    dashArray: '5, 5'
+};
 
-// Добавляем слой в управление
+// Основные статические маршруты (координаты из открытых источников)
+const tankerRoutes = [
+    {
+        name: "Баку → Актау",
+        coords: [
+            [40.4093, 49.8671], // Баку
+            [40.5, 50.5],       // Направление к Казахстану
+            [43.65, 51.1667]    // Актау
+        ],
+        details: "Перевозка нефти SOCAR → KMG"
+    },
+    {
+        name: "Махачкала → Энзели",
+        coords: [
+            [42.9833, 47.4833], // Махачкала
+            [42.0, 49.0],       // Через центральный Каспий
+            [37.4668, 49.4620]  // Энзели (Иран)
+        ],
+        details: "Российская нефть в Иран"
+    }
+];
+
+// Создаем слой для маршрутов
+const routesLayer = L.layerGroup();
+
+// Рисуем маршруты и порты
+tankerRoutes.forEach(route => {
+    // Линия маршрута
+    L.polyline(route.coords, routeStyle)
+        .bindPopup(`
+            <b>${route.name}</b><br>
+            ${route.details}
+        `)
+        .addTo(routesLayer);
+    
+    // Точки портов (первая и последняя координаты)
+    [route.coords[0], route.coords[route.coords.length-1]].forEach((port, i) => {
+        L.circleMarker(port, {
+            radius: 6,
+            color: '#e67e22',
+            fillColor: '#fff',
+            fillOpacity: 1
+        })
+        .bindPopup(i === 0 ? "Порт отправления" : "Порт назначения")
+        .addTo(routesLayer);
+    });
+});
+
+// Добавляем кнопку управления слоем
 L.control.layers(null, {
     'Маршруты танкеров': routesLayer
 }).addTo(map);
-</script>
+
+// Включаем слой по умолчанию
+routesLayer.addTo(map);
 
 
 <script>
