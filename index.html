@@ -25,6 +25,15 @@
     line-height: 1.6;
     position: relative;
 }
+        .tanker-route {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0.7; }
+}
 
 
 body::before {
@@ -676,6 +685,67 @@ L.control.layers(null, {
       .bindPopup('Каспийское море')
       .openPopup();
   });
+    // Стиль линий маршрутов
+const routeStyle = {
+    color: '#e67e22',
+    weight: 3,
+    dashArray: '5, 5',
+    opacity: 0.7
+};
+
+// Основные маршруты танкеров
+const tankerRoutes = [
+    {
+        name: "Баку (Азербайджан) → Актау (Казахстан)",
+        coords: [
+            [40.4093, 49.8671], // Баку
+            [41.0, 50.5],        // Центр Каспия
+            [43.65, 51.1667]     // Актау
+        ],
+        details: "Перевозка нефти SOCAR → KMG"
+    },
+    {
+        name: "Махачкала (Россия) → Энзели (Иран)",
+        coords: [
+            [42.9833, 47.4833], // Махачкала
+            [42.5, 49.0],        // Северный Каспий
+            [37.4668, 49.4620]   // Энзели
+        ],
+        details: "Российская нефть в Иран"
+    }
+];
+
+// Добавляем маршруты на карту
+const routesLayer = L.layerGroup();
+tankerRoutes.forEach(route => {
+    L.polyline(route.coords, {
+        ...routeStyle,
+        className: 'tanker-route' // Для стилизации CSS
+    })
+    .bindPopup(`
+        <b>${route.name}</b><br>
+        ${route.details}<br>
+        <small>Длина: ${L.GeometryUtil.length(route.coords).toFixed(0)} км</small>
+    `)
+    .addTo(routesLayer);
+});
+
+// Добавляем иконки портов
+const portIcon = L.icon({
+    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+    iconSize: [25, 41]
+});
+
+tankerRoutes.flatMap(r => r.coords.slice(0, -1)).forEach(coord => {
+    L.marker(coord, { icon: portIcon })
+        .bindPopup("Нефтеналивной терминал")
+        .addTo(routesLayer);
+});
+
+// Добавляем слой в управление
+L.control.layers(null, {
+    'Маршруты танкеров': routesLayer
+}).addTo(map);
 </script>
 
 
