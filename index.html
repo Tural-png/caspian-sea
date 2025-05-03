@@ -318,9 +318,11 @@ body.dark-mode .card {
             </div>
         </div>
         <section id="map-section">
+            <div class="map" id="map" style="height: 500px; width: 100%; border: 1px solid #ccc;"></div>
             <h2>Карта Каспийского моря</h2>
             <div id="map"></div>
           </section>
+        
           
           
 
@@ -532,6 +534,34 @@ body.dark-mode .card {
 
 
 </body>
+    <!-- Подключаем Leaflet CSS и JS -->
+<link 
+  rel="stylesheet" 
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script 
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  defer
+></script>
+
+<!-- Наш скрипт для карты -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Создаем карту с центром в Каспийском море
+    const map = L.map('map').setView([41.0, 50.0], 6); // Широта, долгота, масштаб
+
+    // Добавляем слой OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Добавляем маркер (опционально)
+    L.marker([41.0, 50.0])
+      .addTo(map)
+      .bindPopup('Каспийское море')
+      .openPopup();
+  });
+</script>
 
 
 <script>
