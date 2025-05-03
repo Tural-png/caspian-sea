@@ -578,6 +578,88 @@ body.dark-mode .card {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
     }).addTo(map);
+      // 1. Границы стран Каспийского региона (GeoJSON)
+fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
+  .then(response => response.json())
+  .then(data => {
+    const caspianCountries = data.features.filter(f => 
+      ['RUS', 'KAZ', 'TKM', 'AZE', 'IRN'].includes(f.properties.iso_a2)
+    );
+    
+    L.geoJSON(caspianCountries, {
+      style: {
+        color: '#555',
+        weight: 2,
+        fillOpacity: 0.1
+      },
+      onEachFeature: (feature, layer) => {
+        layer.bindPopup(`<b>${feature.properties.name}</b>`);
+      }
+    }).addTo(map);
+  });
+
+// 2. Нефтяные платформы (иконки + кластеры)
+const oilPlatforms = [
+  { coords: [40.3, 50.5], name: "Нефтяное месторождение Азери" },
+  { coords: [40.8, 51.2], name: "Месторождение Чираг" },
+  { coords: [39.9, 50.1], name: "Платформа Нефт Дашлары" }
+];
+
+const oilIcon = L.divIcon({
+  html: '<div style="background: red; border-radius: 50%; width: 20px; height: 20px; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold;">🛢️</div>',
+  className: 'oil-marker'
+});
+
+const platformsLayer = L.layerGroup();
+oilPlatforms.forEach(platform => {
+  L.marker(platform.coords, { icon: oilIcon })
+    .bindPopup(`<b>${platform.name}</b>`)
+    .addTo(platformsLayer);
+});
+platformsLayer.addTo(map);
+
+// 3. Экологические угрозы (круги + маркеры)
+const threatsLayer = L.layerGroup([
+  L.circle([40.5, 50.5], { radius: 15000, color: 'red' })
+    .bindPopup("<b>Зона разливов нефти</b><br>Загрязнение 2020-2023"),
+  
+  L.marker([41.2, 51.8], { 
+    icon: L.divIcon({ html: '⚠️', className: 'threat-icon' }) 
+  }).bindPopup("<b>Снижение уровня воды</b><br>-1.5 см/год"),
+  
+  L.polygon([[41.5,49.5], [40.5,50.5], [41.0,51.5]], { 
+    color: 'orange',
+    fillOpacity: 0.3
+  }).bindPopup("Ареал каспийского тюленя (сокращается)")
+]).addTo(map);
+
+// 4. Глубины (цветные полигоны)
+const depthZones = [
+  {
+    coords: [[42,48], [40,50], [38,52], [40,53]],
+    color: '#1a5cb8',
+    label: "Глубина >1000 м"
+  },
+  {
+    coords: [[44,47], [42,49], [40,51], [42,52]],
+    color: '#4a8df0',
+    label: "Глубина 200-1000 м"
+  }
+];
+
+depthZones.forEach(zone => {
+  L.polygon(zone.coords, {
+    color: zone.color,
+    fillOpacity: 0.2,
+    weight: 1
+  }).bindPopup(zone.label).addTo(map);
+});
+
+// Добавляем панель управления слоями
+L.control.layers(null, {
+  'Нефтяные платформы': platformsLayer,
+  'Экоугрозы': threatsLayer
+}).addTo(map);
 
     // Добавляем маркер (опционально)
     L.marker([41.0, 50.0])
