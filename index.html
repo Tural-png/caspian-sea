@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Каспийское море: Экология в реальном времени</title>
@@ -16,12 +19,13 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background:url('images/kaspi.jpg') no-repeat center center fixed;
+            background:url('images/море.jpg') no-repeat center center fixed;
             background-size: cover;
     color: white;
     line-height: 1.6;
     position: relative;
 }
+
 
 body::before {
     content: '';
@@ -33,6 +37,43 @@ body::before {
     background: rgba(0, 48, 72, 0.7);
     z-index: -1;
 }
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+body.dark-mode .card {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+.footer {
+    width: 100%;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.footer-content a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.footer-content a:hover {
+    text-decoration: underline;
+}
+
+
 
 /* Обновите цвет текста в заголовках */
 .card h2 {
@@ -40,7 +81,7 @@ body::before {
     border-bottom: 2px solid rgba(168, 230, 255, 0.3);
         }
         header {
-    background: linear-gradient(135deg, #1a2980, #26d0ce); /* Красивый сине-голубой градиент */
+    background: linear-gradient(135deg, #0a0f30, #000000); /* Красивый сине-голубой градиент */
     color: white;
     padding: 2rem 1rem;
     text-align: center;
@@ -107,7 +148,7 @@ body::before {
         }
         
         .flip-card-front {
-            background: linear-gradient(135deg, #00838f, #006064);
+            background: linear-gradient(135deg, #020224, #190430);
             color: white;
         }
         
@@ -125,9 +166,9 @@ body::before {
         .flip-card-back {
             background: white;
             transform: rotateY(180deg);
-            color: #006064;
+            color: #020505;
             text-align: center;
-            border: 2px solid #00838f;
+            border: 2px solid #0f1a1b;
         }
         
         .flip-card-back p {
@@ -200,9 +241,15 @@ body::before {
             background: var(--ocean-deep);
             transform: scale(1.05);
         }
+
+
+
+
+
+
         footer {
     /* Цвет и градиент */
-    background: linear-gradient(to right, #0f4c75, #3282b8); /* Новый градиент */
+    background: linear-gradient(to right, #0d1e29, #051f31); /* Новый градиент */
     
     /* Форма */
     border-radius: 15px 15px 0 0; /* Закругление верхних углов */
@@ -224,6 +271,16 @@ body::before {
 </head>
 <body>
     <header>
+        <script>
+            (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+            }
+            })();
+        </script>
+
+        <button id="theme-toggle">🌙</button>
         <h1>Каспийское море: Экологический мониторинг</h1>
         <p>Актуальные данные на <span id="current-date"></span></p>
     </header>
@@ -260,6 +317,12 @@ body::before {
                 </div>
             </div>
         </div>
+        <section id="map-section">
+            <h2>Карта Каспийского моря</h2>
+            <div id="map"></div>
+          </section>
+          
+          
 
         <div class="card">
             <h2>🌡️ Климатическое влияние</h2>
@@ -347,9 +410,6 @@ body::before {
             </div>
         </div>
 
-    <footer>
-        © 2024 | Данные: NASA, Caspian Environment Programme, Росгидромет;
-    </footer>
 
     <script>
         // Текущая дата
@@ -368,9 +428,9 @@ body::before {
                 datasets: [{
                     label: 'Уровень воды (м ниже уровня океана)',
                     data: [-28.1, -28.0, -28.2, -28.5, -28.3, -28.4, -28.6, -28.7, -28.9, -29.0, 
-                           -29.1, -29.2, -29.1, -29.3, -29.2, -29.4, -29.3, -29.5, -29.4, -29.6,
-                           -29.5, -29.4, -29.3, -29.5, -29.4, -29.6, -29.5, -29.7, -29.6, -29.5,
-                           -29.4, -29.6, -29.5, -29.7, -29.6],
+                        -29.1, -29.2, -29.1, -29.3, -29.2, -29.4, -29.3, -29.5, -29.4, -29.6,
+                        -29.5, -29.4, -29.3, -29.5, -29.4, -29.6, -29.5, -29.7, -29.6, -29.5,
+                        -29.4, -29.6, -29.5, -29.7, -29.6],
                     borderColor: '#00838f',
                     backgroundColor: 'rgba(0, 131, 143, 0.1)',
                     borderWidth: 3,
@@ -460,5 +520,39 @@ body::before {
             alert('Данные обновлены!');
         });
     </script>
+        <footer class="footer">
+            <div class="footer-content">
+                <p>© 2024 | Данные: NASA, Caspian Environment Programme, Росгидромет;.</p>
+                <p><a href="https://github.com/tural-png" target="_blank">GitHub</a></p>
+            </div>
+        </footer>
+        <script>
+
+</script>
+
+
 </body>
+
+
+<script>
+
+
+    const toggleButton = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    // Проверяем сохранённую тему при загрузке страницы
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        toggleButton.textContent = '☀️';
+    }
+
+    toggleButton.addEventListener('click', () => {
+    body.classList.toggle('dark-mode');
+        const isDark = body.classList.contains('dark-mode');
+        toggleButton.textContent = isDark ? '☀️' : '🌙';
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+</script>
+
 </html>
