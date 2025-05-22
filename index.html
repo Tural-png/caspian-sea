@@ -79,25 +79,25 @@ body.dark-mode .card {
 }
 /* Добавьте этот код в <style> или ваш CSS-файл */
 .map-container {
-  position: relative;
-  z-index: 1; /* Отделяет карту от других элементов */
-  margin: 20px 0;
-  overflow: hidden; /* Обрезает выпадающие элементы */
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 1; /* Отделяет карту от других элементов */
+    margin: 20px 0;
+    overflow: hidden; /* Обрезает выпадающие элементы */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 #map {
-  width: 100%;
-  height: 500px; /* Фиксированная высота */
-  background: #f0f0f0; /* Фон, если карта не загрузится */
+    width: 100%;
+    height: 500px; /* Фиксированная высота */
+    background: #f0f0f0; /* Фон, если карта не загрузится */
 }
 
 /* Для мобильных устройств */
 @media (max-width: 768px) {
-  #map {
+    #map {
     height: 300px;
-  }
+    }
 }
 
 
@@ -226,7 +226,7 @@ body.dark-mode .card {
         .warning-text {
             color: var(--warning);
         }
-        .chart-container {
+        art-container {
             position: relative;
             height: 400px;
             margin: 2rem 0;
@@ -267,7 +267,32 @@ body.dark-mode .card {
             background: var(--ocean-deep);
             transform: scale(1.05);
         }
+/* Основные стили */
+.salinity-chart {
+    background: rgba(247, 237, 220, 0.884);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+h4{
+            color: #000000;
+        }
 
+.chart-container {
+    height: 400px;
+    position: relative;
+}
+
+.source {
+    font-size: 14px;
+    color: #000000;
+    text-align: center;
+    margin-top: 14px;
+}
 
 
 /* Стили для иконок */
@@ -276,9 +301,9 @@ body.dark-mode .card {
 
 /* Панель управления */
 .leaflet-control-layers { 
-  background: white !important; 
-  padding: 10px !important;
-  border-radius: 5px !important;
+    background: white !important; 
+    padding: 10px !important;
+    border-radius: 5px !important;
 }
 
 
@@ -330,7 +355,7 @@ body.dark-mode .card {
             </div>
         </div>
 
-              <div class="card">
+            <div class="card">
             <h2>⚠️ Основные экологические угрозы</h2>
             <div class="data-grid">
                 <div class="data-item">
@@ -350,15 +375,24 @@ body.dark-mode .card {
                 </div>
             </div>
         </div>
-<section class="map-section">
-  <div class="container">
-    <h2>Карта Каспийского моря</h2>
-    <div class="map-container">
-      <div id="map"></div>
-    </div>
-  </div>
-</section>    
-           
+        <div class="salinity-chart">
+            <h4>Солёность Каспийского моря (2013-2023)</h4>
+                <div class="chart-container">
+                <canvas id="salinityBarChart"></canvas>
+        </div>
+            <p class="source">Данные: КаспНИРХ</p>
+            </div>
+
+        <section class="map-section">
+            <div class="container">
+                <h2>Карта Каспийского моря</h2>
+                    <div class="map-container">
+                        <div id="map">
+                    </div>
+                </div>
+            </div>
+        </section>    
+        
         <div class="card">
             <h2>🌡️ Климатическое влияние</h2>
             <div class="chart-container" style="height:300px">
@@ -564,6 +598,67 @@ body.dark-mode .card {
             </div>
         </footer>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Данные для диаграммы
+  const salinityData = {
+    years: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+    values: [12.1, 12.3, 12.4, 12.6, 12.5, 12.7, 12.8, 12.6, 12.9, 13.0, 13.1],
+    unit: '‰'
+  };
+
+  // Создание столбчатой диаграммы
+  const ctx = document.getElementById('salinityBarChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: salinityData.years,
+      datasets: [{
+        label: 'Солёность (' + salinityData.unit + ')',
+        data: salinityData.values,
+        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: false,
+          min: 11,
+          max: 14,
+          ticks: {
+            stepSize: 0.5,
+            callback: function(value) {
+              return value + salinityData.unit;
+            }
+          },
+          title: {
+            display: true,
+            text: 'Солёность (' + salinityData.unit + ')'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Год'
+          }
+        }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.parsed.y + salinityData.unit;
+            }
+          }
+        }
+      }
+    }
+  });
+</script>
 <!-- Подключаем Leaflet CSS и JS -->
 <link 
   rel="stylesheet" 
