@@ -32,53 +32,6 @@
 @keyframes moveLine {
     to { stroke-dashoffset: -20; }
 }
-         body {
-            font-family: 'Arial', sans-serif;
-            background: #f5f9fc;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 25px;
-        }
-        h1 {
-            color: #2c7be5;
-            text-align: center;
-            margin-bottom: 5px;
-        }
-        .chart-container {
-            height: 70vh;
-            min-height: 400px;
-            width: 100%;
-            margin: 20px 0;
-            position: relative;
-        }
-        .data-source {
-            font-size: 12px;
-            color: #6c757d;
-            text-align: center;
-            margin-top: 15px;
-        }
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        button {
-            background: #2c7be5;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
 body::before {
     content: '';
     position: fixed;
@@ -376,25 +329,8 @@ body.dark-mode .card {
                 </p>
             </div>
         </div>
-        <div class="container">
-        <h1>Динамика солёности Каспийского моря</h1>
-        
-        <div class="controls">
-            <button onclick="changeChartType('line')">Линейный график</button>
-            <button onclick="changeChartType('bar')">Столбчатая диаграмма</button>
-        </div>
-        
-        <div class="chart-container">
-            <canvas id="salinityChart"></canvas>
-        </div>
-        
-        <p class="data-source">
-            Источник: КаспНИРХ, данные за 2013-2023 гг. | Последнее обновление: июнь 2023
-        </p>
-    </div>
 
-
-        <div class="card">
+              <div class="card">
             <h2>⚠️ Основные экологические угрозы</h2>
             <div class="data-grid">
                 <div class="data-item">
@@ -725,109 +661,6 @@ depthZones.forEach(zone => {
   }).bindPopup(zone.label).addTo(map);
 });
 
-// Добавляем панель управления слоями
-L.control.layers(null, {
-  'Нефтяные платформы': platformsLayer,
-  'Экоугрозы': threatsLayer
-}).addTo(map);
-
-    // Добавляем маркер (опционально)
-    L.marker([41.0, 50.0])
-      .addTo(map)
-      .bindPopup('Каспийское море')
-      .openPopup();
-  });
-    <script>
-        // Реальные данные (пример)
-        const realData = {
-            years: [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023],
-            salinity: [12.1, 12.3, 12.4, 12.6, 12.5, 12.7, 12.8, 12.6, 12.9, 13.0, 13.1]
-        };
-
-        let myChart;
-
-        function initChart() {
-            const ctx = document.getElementById('salinityChart');
-            
-            myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: realData.years,
-                    datasets: [{
-                        label: 'Солёность (‰)',
-                        data: realData.salinity,
-                        borderColor: '#2c7be5',
-                        backgroundColor: 'rgba(44, 123, 229, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) => ` ${ctx.parsed.y}‰`
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            min: 11,
-                            max: 14,
-                            title: {
-                                display: true,
-                                text: 'Солёность (‰)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Год'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function changeChartType(type) {
-            if (myChart) {
-                myChart.destroy();
-            }
-            
-            const ctx = document.getElementById('salinityChart');
-            myChart = new Chart(ctx, {
-                type: type,
-                data: {
-                    labels: realData.years,
-                    datasets: [{
-                        label: 'Солёность (‰)',
-                        data: realData.salinity,
-                        borderColor: '#2c7be5',
-                        backgroundColor: type === 'bar' ? '#2c7be5' : 'rgba(44, 123, 229, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: type !== 'bar'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            min: 11,
-                            max: 14
-                        }
-                    }
-                }
-            });
-        }
-
-        // Инициализация при загрузке
-        window.addEventListener('load', initChart);
     </script>
 </script>
 </html>
