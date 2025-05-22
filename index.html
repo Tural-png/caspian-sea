@@ -29,7 +29,10 @@
     animation: moveLine 5s infinite linear;
     stroke-dasharray: 10, 10;
 }
-        body {
+@keyframes moveLine {
+    to { stroke-dashoffset: -20; }
+}
+         body {
             font-family: 'Arial', sans-serif;
             background: #f5f9fc;
             margin: 0;
@@ -76,10 +79,6 @@
             border-radius: 5px;
             cursor: pointer;
         }
-
-@keyframes moveLine {
-    to { stroke-dashoffset: -20; }
-}
 body::before {
     content: '';
     position: fixed;
