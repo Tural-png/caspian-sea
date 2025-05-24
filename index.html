@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Каспийское море: Экология в реальном времени</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -14,125 +14,160 @@
             --ocean-light: #00838f;
             --danger: #000000;
             --warning: #ffa000;
+            --text-light: #ffffff;
+            --text-dark: #020505;
         }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background:url('images/море.jpg') no-repeat center center fixed;
+            background: url('images/море.jpg') no-repeat center center fixed;
             background-size: cover;
-    color: white;
-    line-height: 1.6;
-    position: relative;
-}
-.leaflet-interactive.leaflet-polyline {
-    animation: moveLine 5s infinite linear;
-    stroke-dasharray: 10, 10;
-}
-@keyframes moveLine {
-    to { stroke-dashoffset: -20; }
-}
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 48, 72, 0.7);
-    z-index: -1;
-}
-body.dark-mode {
-    background-color: #121212;
-    color: #ffffff;
-}
-
-body.dark-mode .card {
-    background-color: #1e1e1e;
-    color: #ffffff;
-}
-.footer {
-    width: 100%;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 20px 0;
-    font-size: 14px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    text-align: center;
-}
-
-.footer-content a {
-    color: var(--text-color);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.footer-content a:hover {
-    text-decoration: underline;
-}
-/* Добавьте этот код в <style> или ваш CSS-файл */
-.map-container {
-    position: relative;
-    z-index: 1; /* Отделяет карту от других элементов */
-    margin: 20px 0;
-    overflow: hidden; /* Обрезает выпадающие элементы */
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-#map {
-    width: 100%;
-    height: 500px; /* Фиксированная высота */
-    background: #f0f0f0; /* Фон, если карта не загрузится */
-}
-
-/* Для мобильных устройств */
-@media (max-width: 768px) {
-    #map {
-    height: 300px;
-    }
-}
-
-
-/* Обновите цвет текста в заголовках */
-.card h2 {
-    color: #a8e6ff;
-    border-bottom: 2px solid rgba(168, 230, 255, 0.3);
+            color: var(--text-light);
+            line-height: 1.6;
+            position: relative;
         }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 48, 72, 0.7);
+            z-index: -1;
+        }
+        
+        body.dark-mode {
+            background-color: #121212;
+            color: var(--text-light);
+        }
+        
+        body.dark-mode .card {
+            background-color: #1e1e1e;
+            color: var(--text-light);
+        }
+        
         header {
-    background: linear-gradient(135deg, #0a0f30, #000000); /* Красивый сине-голубой градиент */
-    color: white;
-    padding: 2rem 1rem;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    border-radius: 0 0 15px 15px;
-    
-            }
+            background: linear-gradient(135deg, #0a0f30, #000000);
+            color: var(--text-light);
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 15px 15px;
+        }
+        
         .container {
             max-width: 1000px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
+        
         .card {
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 2rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s;
+            color: var(--text-dark);
         }
+        
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
+        
+        .card h2 {
+            color: var(--ocean-light);
+            border-bottom: 2px solid rgba(0, 131, 143, 0.3);
+            padding-bottom: 0.5rem;
+        }
+        
+        .danger-text {
+            color: var(--danger);
+            font-weight: bold;
+        }
+        
+        .warning-text {
+            color: var(--warning);
+        }
+        
+        .map-container {
+            position: relative;
+            z-index: 1;
+            margin: 20px 0;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        #map {
+            width: 100%;
+            height: 500px;
+            background: #f0f0f0;
+        }
+        
+        .salinity-chart {
+            background: rgba(247, 237, 220, 0.884);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .chart-container {
+            height: 400px;
+            position: relative;
+        }
+        
+        .source {
+            font-size: 14px;
+            color: var(--text-dark);
+            text-align: center;
+            margin-top: 14px;
+        }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .data-item {
+            background: #f9f9f9;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .data-item h3 {
+            margin-top: 0;
+            color: var(--ocean-light);
+        }
+        
+        button {
+            background: var(--ocean-light);
+            color: var(--text-light);
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 0.5rem 0;
+        }
+        
+        button:hover {
+            background: var(--ocean-deep);
+            transform: scale(1.05);
+        }
+        
         .flip-cards-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -175,7 +210,7 @@ body.dark-mode .card {
         
         .flip-card-front {
             background: linear-gradient(135deg, #03030c, #010c16);
-            color: white;
+            color: var(--text-light);
         }
         
         .flip-card-front h3 {
@@ -190,9 +225,9 @@ body.dark-mode .card {
         }
         
         .flip-card-back {
-            background: white;
+            background: var(--text-light);
             transform: rotateY(180deg);
-            color: #020505;
+            color: var(--text-dark);
             text-align: center;
             border: 2px solid #0f1a1b;
         }
@@ -203,8 +238,89 @@ body.dark-mode .card {
             margin: 0;
         }
         
+        .fact-box {
+            background: #f5f5f5;
+            border-left: 4px solid var(--ocean-light);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        footer {
+            background: linear-gradient(to right, #0d1e29, #051f31);
+            border-radius: 15px 15px 0 0;
+            color: #bbe1fa;
+            font-size: 1.1rem;
+            padding: 2.5rem 1rem;
+            margin-top: 3rem;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+        
+        .footer-content a {
+            color: #bbe1fa;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .footer-content a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Форма для сообщения о загрязнении */
+        #reportForm {
+            margin-top: 20px;
+        }
+        
+        #reportForm label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        
+        #reportForm input[type="file"],
+        #reportForm textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-top: 5px;
+        }
+        
+        #reportForm textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .output {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            background-color: #fdfdfd;
+            display: none;
+        }
+        
+        .coords {
+            font-family: monospace;
+            color: #444;
+        }
+        
         /* Адаптивность */
         @media (max-width: 768px) {
+            #map {
+                height: 300px;
+            }
+            
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+            
             .flip-cards-container {
                 grid-template-columns: 1fr;
             }
@@ -212,131 +328,41 @@ body.dark-mode .card {
             .flip-card {
                 height: 160px;
             }
-        }
-        
-        .card h2 {
-            color: var(--ocean-light);
-            border-bottom: 2px solid #e0f7fa;
-            padding-bottom: 0.5rem;
-        }
-        .danger-text {
-            color: var(--danger);
-            font-weight: bold;
-        }
-        .warning-text {
-            color: var(--warning);
-        }
-        art-container {
-            position: relative;
-            height: 400px;
-            margin: 2rem 0;
-        }
-        .fact-box {
-            background: #f5f5f5;
-            border-left: 4px solid var(--ocean-light);
-            padding: 1rem;
-            margin: 1rem 0;
-        }
-        .data-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-        .data-item {
-            background: #f9f9f9;
-            padding: 1rem;
-            border-radius: 8px;
-        }
-        .data-item h3 {
-            margin-top: 0;
-            color: var(--ocean-light);
-        }
-        button {
-            background: var(--ocean-light);
-            color: white;
-            border: none;
-            padding: 0.7rem 1.5rem;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            margin: 0.5rem 0;
-        }
-        button:hover {
-            background: var(--ocean-deep);
-            transform: scale(1.05);
-        }
-/* Основные стили */
-.salinity-chart {
-    background: rgba(247, 237, 220, 0.884);
-    border-radius: 10px;
-    padding: 20px;
-    margin: 20px 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    max-width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
-}
-h4{
-            color: #000000;
-        }
-
-.chart-container {
-    height: 400px;
-    position: relative;
-}
-
-.source {
-    font-size: 14px;
-    color: #000000;
-    text-align: center;
-    margin-top: 14px;
-}
-
-
-/* Стили для иконок */
-.oil-marker { margin-left: -10px !important; margin-top: -10px !important; }
-.threat-icon { font-size: 24px; margin-left: -12px !important; margin-top: -12px !important; }
-
-/* Панель управления */
-.leaflet-control-layers { 
-    background: white !important; 
-    padding: 10px !important;
-    border-radius: 5px !important;
-}
-
-
-        footer {
-    /* Цвет и градиент */
-    background: linear-gradient(to right, #0d1e29, #051f31); /* Новый градиент */
-    
-    /* Форма */
-    border-radius: 15px 15px 0 0; /* Закругление верхних углов */
-    
-    color: #bbe1fa; /* Светло-голубой текст */
-    font-size: 1.1rem;
-    
-    padding: 2.5rem 1rem; /* Больше внутренних отступов */
-    margin-top: 3rem; /* Отделение от контента */
-    
-    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
-    }
-        @media (max-width: 768px) {
-            .data-grid {
-                grid-template-columns: 1fr;
+            
+            .chart-container {
+                height: 300px;
             }
         }
+        /* Стили для предпросмотра изображения */
+.image-preview-container {
+    margin-top: 15px;
+    text-align: center;
+}
+
+#preview {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    object-fit: contain;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.output {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 8px;
+}
     </style>
 </head>
 <body>
     <header>
         <script>
             (function() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-            document.documentElement.classList.add('dark-mode');
-            }
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                }
             })();
         </script>
         <h1>Каспийское море: Экологический мониторинг</h1>
@@ -350,12 +376,11 @@ h4{
                 <canvas id="waterLevelChart"></canvas>
             </div>
             <div class="fact-box">
-                <p><span class="danger-text">С 1990 года уровень Каспийского моря снизился на 1.5 метра. Основные причины: климатические изменения и забор воды из впадающих рек.</span>. 
-                </p>
+                <p><span class="danger-text">С 1990 года уровень Каспийского моря снизился на 1.5 метра. Основные причины: климатические изменения и забор воды из впадающих рек.</span></p>
             </div>
         </div>
 
-            <div class="card">
+        <div class="card">
             <h2>⚠️ Основные экологические угрозы</h2>
             <div class="data-grid">
                 <div class="data-item">
@@ -366,7 +391,7 @@ h4{
                 <div class="data-item">
                     <h3>Микропластик</h3>
                     <p><span class="danger-text">0.8 частиц/м³</span> (2023)</p>
-                    <p><span class="danger-text">+15% за последние 5 лет</span></p></p>
+                    <p><span class="danger-text">+15% за последние 5 лет</span></p>
                 </div>
                 <div class="data-item">
                     <h3>Снижение биоразнообразия</h3>
@@ -375,31 +400,50 @@ h4{
                 </div>
             </div>
         </div>
+
         <div class="salinity-chart">
             <h4>Солёность Каспийского моря (2013-2023)</h4>
-                <div class="chart-container">
+            <div class="chart-container">
                 <canvas id="salinityBarChart"></canvas>
-        </div>
+            </div>
             <p class="source">Данные: КаспНИРХ</p>
-            </div>
+        </div>
 
-        <section class="map-section">
-            <div class="container">
-                <h2>Карта Каспийского моря</h2>
-                    <div class="map-container">
-                        <div id="map">
-                    </div>
-                </div>
-            </div>
-        </section>    
+<div class="card">
+    <h2>🛑 Сообщить о загрязнении Каспийского моря</h2>
+    <form id="reportForm">
+        <label>Фото загрязнения:</label>
+        <input type="file" name="photo" accept="image/*" required>
         
+        <label>Описание:</label>
+        <textarea name="description" placeholder="Например: выброс нефти или мусор на берегу" required></textarea>
+        
+        <label>Выберите место на карте:</label>
+        <div id="map"></div>
+        
+        <input type="hidden" name="latitude">
+        <input type="hidden" name="longitude">
+        
+        <button type="submit">Показать результат</button>
+    </form>
+    
+    <div class="output" id="output" style="display:none;">
+        <h3>📋 Отчёт</h3>
+        <p><strong>Описание:</strong> <span id="desc"></span></p>
+        <p><strong>Координаты:</strong> <span id="coords" class="coords"></span></p>
+        <div class="image-preview-container">
+            <img id="preview" src="" alt="Предпросмотр загруженного изображения">
+        </div>
+    </div>
+</div>
+
         <div class="card">
             <h2>🌡️ Климатическое влияние</h2>
             <div class="chart-container" style="height:300px">
                 <canvas id="tempChart"></canvas>
             </div>
             <p><span class="danger-text">Среднегодовая температура воды повысилась на <span class="warning-text">1.2°C</span> с 1980 года.</span></p>
-            <button onclick="location.href=' https://frcs.kazhydromet.kz/'">Актуальные данные</button>
+            <button onclick="location.href='https://frcs.kazhydromet.kz/'">Актуальные данные</button>
         </div>
 
         <div class="card">
@@ -478,8 +522,19 @@ h4{
                 </div>
             </div>
         </div>
+    </div>
 
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2024 | Данные: NASA, Caspian Environment Programme, Росгидромет;</p>
+            <p>Свяжитесь с нами по номеру: +7 700 362 10 55 или +7 702 042 20 61</p>
+            <p><a href="https://github.com/tural-png" target="_blank">GitHub</a></p>
+        </div>
+    </footer>
 
+    <!-- Подключаем Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <script>
         // Текущая дата
         document.getElementById('current-date').textContent = new Date().toLocaleDateString('ru', {
@@ -566,236 +621,123 @@ h4{
             }
         });
 
-        // Случайные факты
-        const facts = [
-            "В 1977 году уровень Каспия достиг -29.0 м, затем начал расти до 1995 года.",
-            "Каспийский тюлень — единственное морское млекопитающее в этом водоёме.",
-            "Объём воды в Каспии — около 78 000 км³ (в 3.5 раза больше Байкала).",
-            "Солёность меняется от 0.5‰ на севере до 13‰ на юге."
-        ];
+        // График солёности
+        const salinityData = {
+            years: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+            values: [12.1, 12.3, 12.4, 12.6, 12.5, 12.7, 12.8, 12.6, 12.9, 13.0, 13.1],
+            unit: '‰'
+        };
 
-        function showRandomFact() {
-            const factElement = document.getElementById('random-fact');
-            factElement.style.display = 'block';
-            factElement.textContent = facts[Math.floor(Math.random() * facts.length)];
-        }
+        const salinityCtx = document.getElementById('salinityBarChart').getContext('2d');
+        new Chart(salinityCtx, {
+            type: 'bar',
+            data: {
+                labels: salinityData.years,
+                datasets: [{
+                    label: 'Солёность (' + salinityData.unit + ')',
+                    data: salinityData.values,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 11,
+                        max: 14,
+                        ticks: {
+                            stepSize: 0.5,
+                            callback: function(value) {
+                                return value + salinityData.unit;
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Солёность (' + salinityData.unit + ')'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Год'
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + salinityData.unit;
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
-        // Имитация обновления данных
-        document.getElementById('update-btn').addEventListener('click', function() {
-            waterLevelChart.data.datasets[0].data = waterLevelChart.data.datasets[0].data.map(
-                y => y + (Math.random() * 0.2 - 0.1)
-            );
-            waterLevelChart.update();
-            alert('Данные обновлены!');
+        // Карта для формы сообщения о загрязнении
+        const form = document.getElementById('reportForm');
+        const output = document.getElementById('output');
+
+        // Центр карты — Каспийское море
+        const map = L.map('map', {
+            center: [43.5, 51.0],
+            zoom: 6,
+            maxBounds: [
+                [36.5, 45],  // юго-запад
+                [48.5, 56]   // северо-восток
+            ],
+            maxBoundsViscosity: 1.0
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        let marker;
+
+        map.on('click', function (e) {
+            const { lat, lng } = e.latlng;
+
+            // Удаляем старый маркер
+            if (marker) map.removeLayer(marker);
+
+            // Добавляем новый маркер
+            marker = L.marker([lat, lng]).addTo(map);
+
+            // Сохраняем координаты
+            document.querySelector('input[name="latitude"]').value = lat.toFixed(6);
+            document.querySelector('input[name="longitude"]').value = lng.toFixed(6);
+        });
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const desc = form.description.value;
+            const file = form.photo.files[0];
+            const lat = form.latitude.value;
+            const lng = form.longitude.value;
+
+            if (!lat || !lng) {
+                alert("⛔ Пожалуйста, выберите точку на карте.");
+                return;
+            }
+
+            // Отображаем результат
+            document.getElementById('desc').textContent = desc;
+            document.getElementById('coords').textContent = `${lat}, ${lng}`;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                document.getElementById('preview').src = event.target.result;
+                output.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
         });
     </script>
-       
-        <footer class="footer">
-            <div class="footer-content">
-                <p>© 2024 | Данные: NASA, Caspian Environment Programme, Росгидромет;</p>
-                <p>Свяжитесь с нами по номеру: +7 700 362 10 55 или +7 702 042 20 61</p>
-                <p><a href="https://github.com/tural-png" target="_blank">GitHub</a></p>
-            </div>
-        </footer>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  // Данные для диаграммы
-  const salinityData = {
-    years: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
-    values: [12.1, 12.3, 12.4, 12.6, 12.5, 12.7, 12.8, 12.6, 12.9, 13.0, 13.1],
-    unit: '‰'
-  };
-
-  // Создание столбчатой диаграммы
-  const ctx = document.getElementById('salinityBarChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: salinityData.years,
-      datasets: [{
-        label: 'Солёность (' + salinityData.unit + ')',
-        data: salinityData.values,
-        backgroundColor: 'rgba(54, 162, 235, 0.7)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: false,
-          min: 11,
-          max: 14,
-          ticks: {
-            stepSize: 0.5,
-            callback: function(value) {
-              return value + salinityData.unit;
-            }
-          },
-          title: {
-            display: true,
-            text: 'Солёность (' + salinityData.unit + ')'
-          }
-        },
-        x: {
-          title: {
-            display: true,
-            text: 'Год'
-          }
-        }
-      },
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return context.parsed.y + salinityData.unit;
-            }
-          }
-        }
-      }
-    }
-  });
-</script>
-<!-- Подключаем Leaflet CSS и JS -->
-<link 
-  rel="stylesheet" 
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-<script 
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  defer
-></script>
-
-<!-- Наш скрипт для карты -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Создаем карту с центром в Каспийском море
-    const map = L.map('map').setView([41.0, 50.0], 6); // Широта, долгота, масштаб
-
-    // Добавляем слой OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
-    }).addTo(map);
-    // 1. Границы стран Каспийского региона (GeoJSON)
-fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
-  .then(response => response.json())
-  .then(data => {
-    const caspianCountries = data.features.filter(f => 
-      ['RUS', 'KAZ', 'TKM', 'AZE', 'IRN'].includes(f.properties.iso_a2)
-    );
-    
-    L.geoJSON(caspianCountries, {
-      style: {
-        color: '#555',
-        weight: 2,
-        fillOpacity: 0.1
-      },
-      onEachFeature: (feature, layer) => {
-        layer.bindPopup(`<b>${feature.properties.name}</b>`);
-      }
-    }).addTo(map);
-  });
-
-// 2. Нефтяные платформы (иконки + кластеры)
-const oilPlatforms = [
-  { coords: [40.3, 50.5], name: "Нефтяное месторождение Азери" },
-  { coords: [40.8, 51.2], name: "Месторождение Чираг" },
-  { coords: [39.9, 50.1], name: "Платформа Нефт Дашлары" }
-];
-
-const oilIcon = L.divIcon({
-  html: '<div style="background: red; border-radius: 50%; width: 20px; height: 20px; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold;">🛢️</div>',
-  className: 'oil-marker'
-});
-
-const platformsLayer = L.layerGroup();
-oilPlatforms.forEach(platform => {
-  L.marker(platform.coords, { icon: oilIcon })
-    .bindPopup(`<b>${platform.name}</b>`)
-    .addTo(platformsLayer);
-});
-platformsLayer.addTo(map);
-
-// 3. Экологические угрозы (круги + маркеры)
-const threatsLayer = L.layerGroup([
-  L.circle([40.5, 50.5], { radius: 15000, color: 'red' })
-    .bindPopup("<b>Зона разливов нефти</b><br>Загрязнение 2020-2023"),
-  
-  L.marker([41.2, 51.8], { 
-    icon: L.divIcon({ html: '⚠️', className: 'threat-icon' }) 
-  }).bindPopup("<b>Снижение уровня воды</b><br>-1.5 см/год"),
-  
-  L.polygon([[41.5,49.5], [40.5,50.5], [41.0,51.5]], { 
-    color: 'orange',
-    fillOpacity: 0.3
-  }).bindPopup("Ареал каспийского тюленя (сокращается)")
-]).addTo(map);
-
-// 4. Глубины (цветные полигоны)
-const depthZones = [
-  {
-    coords: [[42,48], [40,50], [38,52], [40,53]],
-    color: '#1a5cb8',
-    label: "Глубина >1000 м"
-  },
-  {
-    coords: [[44,47], [42,49], [40,51], [42,52]],
-    color: '#4a8df0',
-    label: "Глубина 200-1000 м"
-  }
-];
-
-depthZones.forEach(zone => {
-  L.polygon(zone.coords, {
-    color: zone.color,
-    fillOpacity: 0.2,
-    weight: 1
-  }).bindPopup(zone.label).addTo(map);
-});
-      // Добавляем панель управления слоями
-    L.control.layers(null, {
-        'Нефтяные платформы': platformsLayer,
-        'Экоугрозы': threatsLayer
-    }).addTo(map);
-
-    // Добавляем маркер (опционально)
-        L.marker([41.0, 50.0])
-        .addTo(map)
-        .bindPopup('Каспийское море')
-        .openPopup();
-    });
-    // Данные для примера (реальные можно получить с API)
-const pollutionData = [
-  { lat: 42.5, lon: 50.5, type: "Нефтяное пятно", level: "высокий", color: "#ff4757" },
-  { lat: 40.2, lon: 51.8, type: "Промышленные стоки", level: "средний", color: "#ffa502" },
-  { lat: 41.3, lon: 49.9, type: "Зона очистки", level: "активно", color: "#1e90ff" }
-];
-
-function initMap() {
-  const map = L.map('pollution-map').setView([42.0, 51.0], 6);
-  
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  }).addTo(map);
-
-  // Добавляем метки загрязнений
-  pollutionData.forEach(point => {
-    L.circleMarker([point.lat, point.lon], {
-      color: point.color,
-      fillOpacity: 0.8,
-      radius: point.level === "высокий" ? 12 : 8
-    })
-    .bindPopup(`<b>${point.type}</b><br>Уровень: ${point.level}`)
-    .addTo(map);
-  });
-
-  // Добавляем границы Каспийского моря (GeoJSON)
-  L.geoJSON(caspianGeoJSON, { 
-    style: { color: "#3498db", fillOpacity: 0.1 } 
-  }).addTo(map);
-}
-</script>
 </html>
